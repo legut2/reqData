@@ -12,6 +12,14 @@ Resources:
           /reqData:
             post:
               responses: {}
+      Auth:
+        Authorizers:
+          Users:
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${Users}
+              audience:
+                - !Ref UsersClient
   storedData:
     Type: AWS::DynamoDB::Table
     Properties:
