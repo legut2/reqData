@@ -44,7 +44,7 @@ Resources:
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
         - ResourceName: reqFromEbay
-      CodeUri: src/reqsFromEbay
+      CodeUri: src/reqFromEbay
       Handler: handler.handler
       Runtime: python3.7
       MemorySize: 3008
