@@ -53,13 +53,6 @@ Resources:
             Path: /reqData
             Method: POST
             ApiId: !Ref gateWayApi
-  '?(@.Type === ''AWS::Serverless::HttpApi'')':
-    Properties:
-      Auth:
-        Authorizers:
-          '?(@.JwtConfiguration.audience[0].Ref === ''UserPoolClient'')':
-            JwtConfiguration:
-              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${Users}
   Users:
     Type: AWS::Cognito::UserPool
     Properties:
