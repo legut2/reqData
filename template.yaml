@@ -53,6 +53,26 @@ Resources:
             Path: /reqData
             Method: POST
             ApiId: !Ref gateWayApi
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AliasAttributes:
+        - email
+        - preferred_username
+      UserPoolName: !Sub ${AWS::StackName}-UserPool
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+  '?(@.Type === ''AWS::Serverless::HttpApi'')':
+    Properties:
+      Auth:
+        Authorizers:
+          '?(@.JwtConfiguration.audience[0].Ref === ''UserPoolClient'')':
+            JwtConfiguration:
+              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}
 Parameters:
   StackTagName:
     Type: String
