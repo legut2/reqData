@@ -20,19 +20,6 @@ Resources:
               issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${Users}
               audience:
                 - !Ref UsersClient
-  storedData:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: KeywordsQueryId
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: KeywordsQueryId
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
-      TableName: !Sub ${AWS::StackName}-storedData
   reqData:
     Type: AWS::Serverless::Function
     Properties:
@@ -49,11 +36,11 @@ Resources:
       Policies:
         - AWSXrayWriteOnlyAccess
         - DynamoDBCrudPolicy:
-            TableName: !Ref storedData
+            TableName: !Ref storedSalesData
       Environment:
         Variables:
-          TABLE_NAME: !Ref storedData
-          TABLE_ARN: !GetAtt storedData.Arn
+          TABLE_NAME: !Ref storedSalesData
+          TABLE_ARN: !GetAtt storedSalesData.Arn
       Events:
         gateWayApiPOSTreqData:
           Type: HttpApi
@@ -76,6 +63,19 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref Users
+  storedSalesData:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: KeywordsQueryId
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: KeywordsQueryId
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TableName: !Sub ${AWS::StackName}-storedSalesData
 Parameters:
   StackTagName:
     Type: String
