@@ -24,13 +24,26 @@ Resources:
             - Content-Length
             - Content-Type
           allowCredentials: true
-  reqsFromEbay:
+  storedFromReqs:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TableName: !Sub ${AWS::StackName}-storedFromReqs
+  reqFromEbay:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-reqsFromEbay
+      FunctionName: !Sub ${AWS::StackName}-reqFromEbay
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
-        - ResourceName: reqsFromEbay
+        - ResourceName: reqFromEbay
       CodeUri: src/reqsFromEbay
       Handler: handler.handler
       Runtime: python3.7
@@ -52,19 +65,6 @@ Resources:
         Variables:
           TABLE_NAME: !Ref storedFromReqs
           TABLE_ARN: !GetAtt storedFromReqs.Arn
-  storedFromReqs:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
-      TableName: !Sub ${AWS::StackName}-storedFromReqs
 Parameters:
   StackTagName:
     Type: String
