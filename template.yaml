@@ -12,14 +12,6 @@ Resources:
           /reqData:
             post:
               responses: {}
-      Auth:
-        Authorizers:
-          Users:
-            IdentitySource: $request.header.Authorization
-            JwtConfiguration:
-              issuer: !Sub https://cognito-idp.${AWS::Region}.amazonaws.com/${Users}
-              audience:
-                - !Ref UsersClient
   reqData:
     Type: AWS::Serverless::Function
     Properties:
@@ -48,21 +40,6 @@ Resources:
             Path: /reqData
             Method: POST
             ApiId: !Ref gateWayApi
-  Users:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: false
-      AliasAttributes:
-        - email
-        - preferred_username
-      UserPoolName: !Sub ${AWS::StackName}-Users
-      AutoVerifiedAttributes:
-        - email
-  UsersClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      UserPoolId: !Ref Users
   storedSalesData:
     Type: AWS::DynamoDB::Table
     Properties:
