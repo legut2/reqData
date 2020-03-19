@@ -9,17 +9,20 @@ Resources:
         info:
           title: !Sub ${AWS::StackName}-HttpApi
         paths:
-          /reqData:
+          /sold:
             post:
               responses: {}
-  reqData:
+          /active:
+            post:
+              responses: {}
+  getSold:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-reqData
+      FunctionName: !Sub ${AWS::StackName}-getSold
       Description: !Sub
         - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
-        - ResourceName: reqData
-      CodeUri: src/reqData
+        - ResourceName: getSold
+      CodeUri: src/getSold
       Handler: handler.handler
       Runtime: python3.7
       MemorySize: 3008
@@ -27,32 +30,35 @@ Resources:
       Tracing: Active
       Policies:
         - AWSXrayWriteOnlyAccess
-        - DynamoDBCrudPolicy:
-            TableName: !Ref storedSalesData
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref storedSalesData
-          TABLE_ARN: !GetAtt storedSalesData.Arn
       Events:
-        gateWayApiPOSTreqData:
+        gateWayApiPOSTsold:
           Type: HttpApi
           Properties:
-            Path: /reqData
+            Path: /sold
             Method: POST
             ApiId: !Ref gateWayApi
-  storedSalesData:
-    Type: AWS::DynamoDB::Table
+  getActive:
+    Type: AWS::Serverless::Function
     Properties:
-      AttributeDefinitions:
-        - AttributeName: KeywordsQueryId
-          AttributeType: S
-      BillingMode: PAY_PER_REQUEST
-      KeySchema:
-        - AttributeName: KeywordsQueryId
-          KeyType: HASH
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
-      TableName: !Sub ${AWS::StackName}-storedSalesData
+      FunctionName: !Sub ${AWS::StackName}-getActive
+      Description: !Sub
+        - Stack ${StackTagName} Environment ${EnvironmentTagName} Function ${ResourceName}
+        - ResourceName: getActive
+      CodeUri: src/getActive
+      Handler: handler.handler
+      Runtime: python3.7
+      MemorySize: 3008
+      Timeout: 30
+      Tracing: Active
+      Policies:
+        - AWSXrayWriteOnlyAccess
+      Events:
+        gateWayApiPOSTactive:
+          Type: HttpApi
+          Properties:
+            Path: /active
+            Method: POST
+            ApiId: !Ref gateWayApi
 Parameters:
   StackTagName:
     Type: String
